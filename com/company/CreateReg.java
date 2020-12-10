@@ -1,4 +1,6 @@
+package com.company;
 
+import com.company.Commands;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -7,11 +9,9 @@ import javax.security.cert.X509Certificate;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.sql.SQLOutput;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -147,16 +147,20 @@ public class CreateReg {
 
                 } else if (HashMode.equals("SHA-256")) {
                     String input = ReadFile(path);
-                    if (regfile.contains(path) && !regfile.contains(DatatypeConverter.printHexBinary(getSHA(input)).toLowerCase()) {
+                    if (regfile.contains(path) && !regfile.contains(DatatypeConverter.printHexBinary(getSHA(input)).toLowerCase())) {
                         String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
                         logwriter.write(s + " " + path + " altered \n");
-                    } else if (!regfile.contains(path)) {
+                        logwriter.flush();
+                    }
+                    else if (!regfile.contains(path)) {
                         String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
                         ArrayList<String> l = new ArrayList<String>(Arrays.asList(regfile.split(" ")));
                         if (l.contains(path)) {
                             logwriter.write(s + " " + path + " deleted \n");
+                            logwriter.flush();
                         } else {
                             logwriter.write(s + " " + path + " created \n");
+                            logwriter.flush();
                         }
                     }
                 }
