@@ -1,7 +1,5 @@
 package com.company;
 
-
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.cert.CertificateException;
@@ -86,7 +84,7 @@ public class CreateReg {
                 timestamp = new Timestamp(System.currentTimeMillis());
                 String path = SourcePath + "/" + file.getName();
                 String line = timestamp + " : " + path + " is added to registry.\n";
-                logFileWriter.write(write);
+                logFileWriter.write(line);
                 i++;
             }
         }
@@ -121,6 +119,7 @@ public class CreateReg {
     }
 
     public static void checkIntegrityOfDirectory(File[] listOfFiles, String sourcePath, String HashMode, String regfile, FileWriter logwriter) throws IOException, NoSuchAlgorithmException {
+        boolean notChanged=true;
         for (File file : listOfFiles) {
             if (file.isFile()) {
                 String path = sourcePath + "/" + file.getName();
@@ -129,6 +128,7 @@ public class CreateReg {
 
 
                     if (regfile.contains(path) && !regfile.contains(getMd5(input).toLowerCase())) {
+                        notChanged=false;
                         String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
                         logwriter.write(s + " " + path + " altered \n");
                         logwriter.flush();
@@ -137,9 +137,11 @@ public class CreateReg {
                         ArrayList<String> l = new ArrayList<String>(Arrays.asList(regfile.split(" ")));
 
                         if (regfile.contains(path) || l.contains(path)) {
+                            notChanged=false;
                             logwriter.write(s + " " + path + " deleted \n");
                             logwriter.flush();
                         } else {
+                            notChanged=false;
                             logwriter.write(s + " " + path + " created \n");
                             logwriter.flush();
                         }
@@ -148,6 +150,7 @@ public class CreateReg {
                 } else if (HashMode.equals("SHA-256")) {
                     String input = ReadFile(path);
                     if (regfile.contains(path) && !regfile.contains(DatatypeConverter.printHexBinary(getSHA(input)).toLowerCase())) {
+                        notChanged=false;
                         String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
                         logwriter.write(s + " " + path + " altered \n");
                         logwriter.flush();
@@ -156,9 +159,11 @@ public class CreateReg {
                         String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
                         ArrayList<String> l = new ArrayList<String>(Arrays.asList(regfile.split(" ")));
                         if (l.contains(path)) {
+                            notChanged=false;
                             logwriter.write(s + " " + path + " deleted \n");
                             logwriter.flush();
                         } else {
+                            notChanged=false;
                             logwriter.write(s + " " + path + " created \n");
                             logwriter.flush();
                         }
@@ -181,11 +186,17 @@ public class CreateReg {
                     files.add(file.getName());
                 }
                 if (!files.contains(e)) {
+                    notChanged=false;
                     String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
                     logwriter.write(s + " " + sourcePath + "/" + e + " deleted \n");
                     logwriter.flush();
                 }
             }
+        }
+        if(notChanged){
+            String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
+            logwriter.write(s + " The directory is checked and no change is detected!");
+            logwriter.flush();
         }
     }
 

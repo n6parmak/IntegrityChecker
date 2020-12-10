@@ -1,7 +1,5 @@
 package com.company;
 
-
-
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +36,7 @@ public class ichecker {
             String encrypted = commands.EncryptAES(privateKey, hashedPass);
             commands.CreatePriKeyFile(PriKeyPath, encrypted);
             commands.CreatePubKeyCertificateFile(PubKeyCertificatePath);
-            //System.out.println("This is the decrypted text " + com.company.Commands.DecryptAES(encrypted, hashedPass));
+            //System.out.println("This is the decrypted text " + com.company.com.company.Commands.DecryptAES(encrypted, hashedPass));
 	    System.exit(0);
         }
 
