@@ -1,7 +1,6 @@
 package com.company;
 
-import com.company.Commands;
-import com.company.CreateReg;
+
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
@@ -11,7 +10,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Main {
+public class ichecker {
     public static void main(String[] args) throws Exception {
         Commands commands = new Commands();
         String PriKeyPath = "";
@@ -23,9 +22,9 @@ public class Main {
         FileWriter RegFileWriter=null;
         FileWriter LogFileWriter=null;
 
-        if(args[1].equals("createCert")){
-            PriKeyPath = args[3];
-            PubKeyCertificatePath = args[5];
+        if(args[0].equals("createCert")){
+            PriKeyPath = args[2];
+            PubKeyCertificatePath = args[4];
             commands.GenerateKey(PriKeyPath);
             commands.GenerateCert(PubKeyCertificatePath,PriKeyPath);
             commands.ImportKey(PriKeyPath);
@@ -43,12 +42,12 @@ public class Main {
 	    System.exit(0);
         }
 
-        else if(args[1].equals("createReg")){
-            String RegFilePath = args[3];
-            String SourcePath = args[5];
-            String LogFilePath = args[7];
-            String HashMode = args[9];
-            String PrivateKeyPath = args[11];
+        else if(args[0].equals("createReg")){
+            String RegFilePath = args[2];
+            String SourcePath = args[4];
+            String LogFilePath = args[6];
+            String HashMode = args[8];
+            String PrivateKeyPath = args[10];
 
             RegFile = CreateReg.CreateFile(RegFilePath);
             LogFile = CreateReg.CreateFile(LogFilePath);
@@ -65,31 +64,31 @@ public class Main {
             File[] listOfFiles = folder.listFiles();
             CreateReg.CreateLogFile(listOfFiles, LogFileWriter, RegFilePath, SourcePath);
             WholeRegFile = CreateReg.CreateRegFile(listOfFiles, RegFileWriter, SourcePath, RegFilePath, HashMode, privateKeyContent);
-            regfilesignature=CreateReg.Sign(WholeRegFile,args[9],args[11]);
+            regfilesignature=CreateReg.Sign(WholeRegFile,args[8],args[10]);
             RegFileWriter.write(DatatypeConverter.printHexBinary(regfilesignature));
             RegFileWriter.close();
             System.exit(0);
         }
-        else if(args[1].equals("check")){
-            WholeRegFile = new String(Files.readAllBytes(Paths.get(args[3])), StandardCharsets.UTF_8);
-            BufferedReader input = new BufferedReader(new FileReader(args[3]));
+        else if(args[0].equals("check")){
+            WholeRegFile = new String(Files.readAllBytes(Paths.get(args[2])), StandardCharsets.UTF_8);
+            BufferedReader input = new BufferedReader(new FileReader(args[2]));
             String last="", line="";
 
             while ((line = input.readLine()) != null) {
                 last = line;
             }
 
-            boolean isvalid=CreateReg.verifySignature(WholeRegFile.substring(0,WholeRegFile.indexOf(last)),hexStringToByteArray(last.trim()),args[11],args[9]);
+            boolean isvalid=CreateReg.verifySignature(WholeRegFile.substring(0,WholeRegFile.indexOf(last)),hexStringToByteArray(last.trim()),args[10],args[8]);
             if(isvalid){
 
-                File folder = new File(args[5]);
+                File folder = new File(args[4]);
                 File[] listOfFiles = folder.listFiles();
-                CreateReg.checkIntegrityOfDirectory(listOfFiles,args[5],args[9],new String(Files.readAllBytes(Paths.get(args[3])), StandardCharsets.UTF_8),new FileWriter(args[7],true));
+                CreateReg.checkIntegrityOfDirectory(listOfFiles,args[4],args[8],new String(Files.readAllBytes(Paths.get(args[2])), StandardCharsets.UTF_8),new FileWriter(args[6],true));
 
             }
             else{
                 String s = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").format(LocalDateTime.now());
-                LogFileWriter = new FileWriter(args[7],true);
+                LogFileWriter = new FileWriter(args[6],true);
                 LogFileWriter.write(s+" Registry file verification failed!");
 		LogFileWriter.close();
                 System.exit(0);
